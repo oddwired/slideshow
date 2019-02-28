@@ -42,8 +42,9 @@ class Slide:
             self.next = slide
 
         else:
-            if len(list(set(self.get_tags() + slide.get_tags()))) > 0:
-                if len(list(set(self.next.get_tags() + slide.get_tags()))) > 0:
+            #print(list(set(self.get_tags()).intersection(slide.get_tags())))
+            if len(list(set(self.get_tags()).intersection(slide.get_tags()))) > 0:
+                if len(list(set(self.next.get_tags()).intersection(slide.get_tags()))) > 0:
                     self.insert_right(slide)
             else:
                 self.next.add_slide(slide)
@@ -112,7 +113,7 @@ def write_file(file_name, root_slide):
 
 if len(sys.argv) != 3:
     print("Usage: slides.py input_file output_file")
-    print(len(sys.argv))
+
 else:
-    # print(read_file(sys.argv[1]))
+
     write_file(sys.argv[2], read_file(sys.argv[1]))
