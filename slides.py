@@ -61,9 +61,11 @@ def read_file(file_name):
         ext_photo = None
         for i in range(int(N)):
             line = f.readline()
+
             id = i
             orientation = line.split()[0]
-            tags = line.split()[1:]
+            tags = line.split()[2:]
+            #print(tags)
             photo = Photo(id, orientation, tags)
 
             if root_slide is None:
@@ -84,10 +86,33 @@ def read_file(file_name):
                     root_slide.add_slide(create_slide([photo]))
         return root_slide
 
+
 def write_file(file_name, root_slide):
-    
+    count = 1
+    current_slide = root_slide
+    while True:
+        if current_slide.next is not None:
+            current_slide = current_slide.next
+            count = count + 1
+        else:
+            break
+
+    with open(file_name, "w+") as f:
+        f.write("%s\n" % (str(count)))
+        current_slide = root_slide
+        while True:
+            if len(current_slide.photos) > 1:
+                f.write("%s %s\n" % (str(current_slide.photos[0].id), str(current_slide.photos[1].id)))
+            else:
+                f.write("%s\n" % (str(current_slide.photos[0].id)))
+            if current_slide.next is not None:
+                current_slide = current_slide.next
+            else:
+                break
+
 if len(sys.argv) != 3:
     print("Usage: slides.py input_file output_file")
     print(len(sys.argv))
 else:
-    print(read_file(sys.argv[1]))
+    # print(read_file(sys.argv[1]))
+    write_file(sys.argv[2], read_file(sys.argv[1]))
