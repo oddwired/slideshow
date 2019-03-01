@@ -50,6 +50,39 @@ class Slide:
                 self.next.add_slide(slide)
 
 
+class Category:
+    def __init__(self):
+        self.categories = {}
+
+    def categorize_slide(self, slide):
+        for tag in slide.get_tags():
+            if tag in self.categories:
+                self.categories[tag].append(slide)
+            else:
+                self.categories[tag] = [slide]
+
+
+def add_slide(root_slide, slide):
+    current_slide = root_slide
+
+    while True:
+        #print([x.id for x in current_slide.photos])
+        if current_slide.next is None:
+            current_slide.next = slide
+            break
+        else:
+            if len(list(set(current_slide.get_tags()).intersection(slide.get_tags()))) > 0:
+                if len(list(set(current_slide.next.get_tags()).intersection(slide.get_tags()))) > 0:
+                    current_slide.insert_left(slide)
+
+                    break
+
+                current_slide = current_slide.next
+            else:
+                current_slide = current_slide.next
+    return slide
+
+
 def create_slide(photo):
     return Slide(photo)
 
@@ -60,6 +93,9 @@ def read_file(file_name):
         root_slide = None
 
         ext_photo = None
+        last_added = None
+
+        categories = Category
         for i in range(int(N)):
             line = f.readline()
 
@@ -81,10 +117,18 @@ def read_file(file_name):
                 if orientation == 'V' and ext_photo is None:
                     ext_photo = photo
                 elif orientation == 'V':
-                    root_slide.add_slide(create_slide([photo, ext_photo]))
+                    if last_added is not None:
+                        last_added = add_slide(last_added, create_slide([photo, ext_photo]))
+                    else:
+                        last_added = add_slide(root_slide, create_slide([photo, ext_photo]))
+
                     ext_photo = None
                 else:
-                    root_slide.add_slide(create_slide([photo]))
+                    if last_added is not None:
+                        last_added = add_slide(last_added, create_slide([photo]))
+                    else:
+                        last_added = add_slide(root_slide, create_slide([photo]))
+
         return root_slide
 
 
